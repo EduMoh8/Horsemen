@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="leaderboard.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Right side content -->
+        <div class="right-section">
+            <!-- Add Participant Button -->
+            <button id="addParticipantBtn">Add Participant</button>
+
+            <!-- Participant Form (Hidden by default) -->
+            <div id="participantForm" class="form-container">
+                <input type="text" id="playerName" placeholder="Enter Name">
+                <input type="file" id="playerImage" accept="image/*">
+                <button id="submitBtn">Submit</button>
+            </div>
+
+            <!-- Leaderboard Table -->
+            <table class="leaderboard">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <tr>
+                        <td>1</td>
+                        <td>Imran</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Alex</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const addBtn = document.getElementById("addParticipantBtn");
+        const form = document.getElementById("participantForm");
+        const submitBtn = document.getElementById("submitBtn");
+        const leaderboardBody = document.getElementById("leaderboardBody");
+        let rankCounter = 3; // Start after existing players
+
+        addBtn.addEventListener("click", () => {
+            form.style.display = form.style.display === "block" ? "none" : "block";
+        });
+
+        submitBtn.addEventListener("click", () => {
+            const name = document.getElementById("playerName").value;
+            const imageFile = document.getElementById("playerImage").files[0];
+
+            if (!name) {
+                alert("Please enter a name");
+                return;
+            }
+
+            const row = document.createElement("tr");
+            const rankCell = document.createElement("td");
+            const playerCell = document.createElement("td");
+
+            rankCell.textContent = rankCounter++;
+            
+            if (imageFile) {
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(imageFile);
+                img.alt = name;
+                img.classList.add("player-img");
+                playerCell.appendChild(img);
+                playerCell.appendChild(document.createTextNode(" " + name));
+            } else {
+                playerCell.textContent = name;
+            }
+
+            row.appendChild(rankCell);
+            row.appendChild(playerCell);
+            leaderboardBody.appendChild(row);
+
+            // Reset form
+            document.getElementById("playerName").value = "";
+            document.getElementById("playerImage").value = "";
+            form.style.display = "none";
+        });
+    </script>
+</body>
+</html>
