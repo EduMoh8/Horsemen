@@ -1,94 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>ഊക്CORE</title>
+  <link rel="stylesheet" href="ook_main.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Left side schematic leaderboard -->
-        <div class="leaderboard" id="leaderboardList"></div>
-
-        <!-- Right side controls -->
-        <div class="right-panel">
-            <button id="addBtn">+ Add Participant</button>
-
-            <table id="participantsTable">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Player</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Rows will be inserted dynamically -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <script>
-        let participants = [
-            { name: "Imran" },
-            { name: "Alex" }
-        ];
-
-        const leaderboardList = document.getElementById("leaderboardList");
-        const tableBody = document.getElementById("tableBody");
-        const addBtn = document.getElementById("addBtn");
-
-        // Function to render leaderboard & table
-        function renderUI() {
-            leaderboardList.innerHTML = "";
-            tableBody.innerHTML = "";
-
-            participants.forEach((p, index) => {
-                // Leaderboard schematic item
-                const lbItem = document.createElement("div");
-                lbItem.className = "lb-item";
-                lbItem.innerText = `${index + 1}. ${p.name}`;
-                leaderboardList.appendChild(lbItem);
-
-                // Table row
-                const tr = document.createElement("tr");
-
-                const rankTd = document.createElement("td");
-                rankTd.textContent = index + 1;
-
-                const nameTd = document.createElement("td");
-                nameTd.textContent = p.name;
-
-                const actionTd = document.createElement("td");
-                const removeBtn = document.createElement("button");
-                removeBtn.textContent = "❌";
-                removeBtn.className = "remove-btn";
-                removeBtn.onclick = () => {
-                    participants.splice(index, 1);
-                    renderUI();
-                };
-                actionTd.appendChild(removeBtn);
-
-                tr.appendChild(rankTd);
-                tr.appendChild(nameTd);
-                tr.appendChild(actionTd);
-
-                tableBody.appendChild(tr);
-            });
-        }
-
-        // Add participant prompt
-        addBtn.addEventListener("click", () => {
-            const name = prompt("Enter participant name:");
-            if (name) {
-                participants.push({ name });
-                renderUI();
-            }
-        });
-
-        renderUI();
-    </script>
+  <div class="split-container">
+    <aside class="left-panel">
+      <img src="/Asset/dammu.PNG" alt="damu" class="damu" />
+      <a href="https://github.com/" target="_blank" class="github-link"></a>
+      <button class="yellow-btn">Welcome To ഊക് മുക്‌ </button>
+    </aside>
+    <main class="right-panel">
+      <h1 class="main-title">ഊക്CORE</h1>
+      <div class="card-list">
+        <a href="generator.html" class="feature-card-link">
+          <div class="feature-card">
+            <strong>ഊക് Generator</strong>
+          </div>
+        </a>
+        <a href="leaderboard.html" class="feature-card-link">
+          <div class="feature-card">
+            <strong>ഊക് LeaderBoard</strong>
+          </div>
+        </a>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
