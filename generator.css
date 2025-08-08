@@ -1,185 +1,84 @@
-/* Jackfruit/Chakka style theme for generator page */
-
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #21252e;
-  color: #fff;
-  min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #111;
+    color: white;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.2rem 2rem 1.2rem 1.5rem;
-  background: transparent;
-  position: relative;
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.chat-header {
+    padding: 1rem;
+    background-color: #222;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
-.logo {
-  font-size: 1.6rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #ffd600;
+.chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.dropdown {
-  font-size: 1.1rem;
-  color: #ffd600;
-  margin-left: 0.2rem;
-  cursor: pointer;
+.message {
+    display: flex;
+    max-width: 70%;
 }
 
-.get-plus {
-  background: transparent;
-  color: #ffd600;
-  border: 2px solid #ffd600;
-  border-radius: 2rem;
-  padding: 0.5rem 1.5rem;
-  font-size: 1.1rem;
-  font-weight: 500;
-  cursor: pointer;
-  margin: 0 auto;
-  display: block;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 1.1rem;
-  box-shadow: 0 2px 8px #0002;
-  transition: background 0.2s, color 0.2s;
-}
-.get-plus:hover {
-  background: #ffd600;
-  color: #21252e;
+.message.user {
+    align-self: flex-end;
+    justify-content: flex-end;
 }
 
-.settings {
-  background: none;
-  border: none;
-  color: #ffd600;
-  font-size: 1.6rem;
-  cursor: pointer;
-  margin-left: auto;
+.message.system {
+    align-self: flex-start;
 }
 
-.main-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-  width: 100vw;
+.bubble {
+    padding: 0.8rem 1rem;
+    border-radius: 15px;
+    background-color: #444;
+    animation: fadeIn 0.3s ease;
 }
 
-.center-content {
-  margin-top: 2.5rem;
-  text-align: center;
+.user .bubble {
+    background-color: #ffca28;
+    color: black;
 }
 
-.main-title {
-  font-size: 2.7rem;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-  margin-top: 2.5rem;
-  color: #ffd600;
-  letter-spacing: 2px;
-  font-family: 'Segoe Script', 'Comic Sans MS', cursive, sans-serif;
+.chat-input {
+    display: flex;
+    padding: 0.8rem;
+    background-color: #222;
 }
 
-.subtitle {
-  font-size: 1.35rem;
-  color: #fffde4;
-  margin-bottom: 2.5rem;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-.input-form {
-  display: flex;
-  align-items: center;
-  background: #181c24;
-  border-radius: 2rem;
-  padding: 0.5rem 1.2rem 0.5rem 0.7rem;
-  box-shadow: 0 4px 24px #ffd60022;
-  max-width: 700px;
-  margin: 0 auto;
-  width: 90vw;
-  border: 2px solid #ffd600;
-  transition: box-shadow 0.2s, border 0.2s;
-}
-
-.input-form:focus-within {
-  box-shadow: 0 8px 32px #ffd60044;
-  border: 2px solid #ffd600;
-}
-
-.input-box {
-  flex: 1;
-  border: none;
-  background: transparent;
-  color: #fff;
-  font-size: 1.25rem;
-  padding: 0.7rem 1rem;
-  outline: none;
-}
-
-.plus-btn, .mic-btn, .wave-btn {
-  background: none;
-  border: none;
-  color: #ffd600;
-  font-size: 1.5rem;
-  margin: 0 0.2rem;
-  cursor: pointer;
-  border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.18s, color 0.18s;
-}
-
-.plus-btn:hover, .mic-btn:hover, .wave-btn:hover {
-  background: #ffd600;
-  color: #181c24;
-}
-
-.plus-btn {
-  font-size: 2rem;
-  font-weight: 400;
-  margin-right: 0.5rem;
-}
-
-.mic-btn, .wave-btn {
-  margin-left: 0.2rem;
-}
-
-@media (max-width: 700px) {
-  .main-title {
-    font-size: 1.6rem;
-    margin-top: 1.5rem;
-  }
-  .subtitle {
+.chat-input input {
+    flex: 1;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 10px;
+    margin-right: 10px;
     font-size: 1rem;
-  }
-  .input-form {
-    max-width: 98vw;
-    padding: 0.3rem 0.5rem 0.3rem 0.2rem;
-  }
-  .header {
-    padding: 0.7rem 0.7rem 0.7rem 0.7rem;
-  }
-  .get-plus {
-    font-size: 0.95rem;
-    padding: 0.3rem 1rem;
-    top: 0.7rem;
-  }
+}
+
+.chat-input button {
+    background-color: #ffca28;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
