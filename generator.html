@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ഊക് Generator Chat</title>
+<link rel="stylesheet" href="generator.css">
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>ഊക് Generator</h2>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <!-- Messages will appear here -->
+    </div>
+    <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type your message...">
+        <button id="sendBtn">Send</button>
+    </div>
+</div>
+
+<script>
+const sendBtn = document.getElementById("sendBtn");
+const messageInput = document.getElementById("messageInput");
+const chatMessages = document.getElementById("chatMessages");
+
+function addMessage(text, sender = "user") {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message", sender);
+    msgDiv.innerHTML = `<div class="bubble">${text}</div>`;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+}
+
+sendBtn.addEventListener("click", () => {
+    const text = messageInput.value.trim();
+    if (text !== "") {
+        addMessage(text, "user");
+        messageInput.value = "";
+
+        // Simulate system reply
+        setTimeout(() => {
+            addMessage("Generated: " + text, "system");
+        }, 500);
+    }
+});
+</script>
+</body>
+</html>

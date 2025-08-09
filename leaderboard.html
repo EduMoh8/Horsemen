@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Animated Leaderboard</title>
+  <link rel="stylesheet" href="leaderboard.css">
+</head>
+<body>
+  <div class="app">
+    <!-- LEFT: Schematic leaderboard -->
+    <aside class="left-panel" id="leftPanel">
+      <h3 class="side-title">Schematic</h3>
+      <div class="schematic" id="schematicList"><!-- avatars inserted here --></div>
+    </aside>
+
+    <!-- RIGHT: Main -->
+    <main class="main-panel">
+      <header class="topbar">
+        <h1>ഊക്CORE — Leaderboard</h1>
+        <button id="openFormBtn" class="big-add">+ ADD PARTICIPANT</button>
+      </header>
+
+      <!-- Add Form Modal -->
+      <div id="modal" class="modal" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true">
+          <h2>Add Participant</h2>
+          <label>
+            Name
+            <input id="inputName" type="text" placeholder="Player name">
+          </label>
+          <label>
+            Score
+            <input id="inputScore" type="number" value="0" min="0">
+          </label>
+          <label>
+            Avatar
+            <input id="inputImage" type="file" accept="image/*">
+          </label>
+          <div class="modal-actions">
+            <button id="cancelBtn" class="btn-secondary">Cancel</button>
+            <button id="submitBtn" class="btn-primary">Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard table -->
+      <section class="board-wrap">
+        <table class="board" id="board">
+          <thead>
+            <tr>
+              <th class="col-rank">Rank</th>
+              <th class="col-player">Player</th>
+              <th class="col-score">Score</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <!-- rows inserted here -->
+          </tbody>
+        </table>
+      </section>
+
+    </main>
+  </div>
+
+<script>
+/* ---------- Data & init ---------- */
+let participants = [
+  { id: cryptoRandomId(), name: "Imran", score: 1500, avatar: null },
+  { id: cryptoRandomId(), name: "Alex", score: 1300, avatar: null },
+  { id: cryptoRandomId(), name: "Sana", score: 1100, avatar: null }
+];
+
+const tbody = document.getElementById('tbody');
+const schematicList = document.getElementById('schematicList');
+
+/* ---------- Utilities ---------- */
+function cryptoRandomId() {
+  // simple unique id
+  return 'p_' + Math.random().toString(36).slice(2,9);
+}
+
+function clamp(n, min=0, max=999999) { return Math.max(min, Math.min(max, Number(n)||0)); }
+
+/* ---------- FLIP animation helpers ---------- */
+function getPositions(containerSelector) {
+  const els = Array.from(document.querySelectorAll(containerSelector));
+  const map = new Map();
+  els.forEach(el => {
+    map.set(el.dataset.id, el.getBoundingClientRect());
+  });
+  return map;
+}
+
+function playFLIP(oldPositions, containerSelector) {
+  const els = Array.from(document.querySelectorAll(containerSelector));
+  els.forEach(el => {
+    const id = el.dataset.id;
+    const oldRect = oldPositions.get(id);
+    if (!oldRect) return;
+    const newRect = el.getBoundingClientRect();
+    const dx = oldRect.left - newRect.left;
+    const dy = oldRect.top - newRect.top;
+    if (dx || dy) {
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      el.style.transition = 'transform 0s';
+      requestAnimationFrame(() => {
+        el.style.transition = 'transform 450ms cubic-bezier(.2,.9,.3,1), opacity 300ms';
+        el.style.transform = '';
+      });
+      el.addEventListener('transitionend', function te() {
+        el.style.transition = '';
+        el.style.transform = '';
+        el.removeEventListener('transitionend', te);
+      });
+    }
+  });
+}
+
+/* ---------- Rendering ---------- */
+function renderAll(animate = true) {
+  // Sort participants by score desc
+  participants.sort((a,b) => b.score - a.score);
+
+  // capture old positions for FLIP (both list and schematic)
+  const oldTbodyPositions = getPositions('#tbody [data-id]');
+  const oldSchematicPositions = getPositions('#schematicList [data-id]');
+
+  // render table rows
+  tbody.innerHTML = '';
+  participants.forEach((p, idx) => {
+    const tr = document.createElement('tr');
+    tr.className = 'row';
+    tr.dataset.id = p.id;
+
+    // rank
+    const tdRank = document.createElement('td');
+    tdRank.className = 'cell-rank';
+    tdRank.textContent = idx + 1;
+
+    // player (avatar + name)
+    const tdPlayer = document.createElement('td');
+    tdPlayer.className = 'cell-player';
+    const avatar = document.createElement('img');
+    avatar.className = 'avatar-small';
+    avatar.alt = p.name;
+    avatar.src = p.avatar || placeholderDataUri(p.name);
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = p.name;
+    tdPlayer.appendChild(avatar);
+    tdPlayer.appendChild(nameSpan);
+
+    // score (editable)
+    const tdScore = document.createElement('td');
+    tdScore.className = 'cell-score';
+    const scoreInput = document.createElement('input');
+    scoreInput.type = 'number';
+    scoreInput.className = 'score-input';
+    scoreInput.value = p.score;
+    scoreInput.min = 0;
+    scoreInput.addEventListener('change', (e) => {
+      p.score = clamp(e.target.value, 0);
+      // animate reorder
+      renderAll(true);
+    });
+    tdScore.appendChild(scoreInput);
+
+    // action (remove)
+    const tdAction = document.createElement('td');
+    tdAction.className = 'cell-action';
+    const rmBtn = document.createElement('button');
+    rmBtn.className = 'btn-remove';
+    rmBtn.title = 'Remove';
+    rmBtn.innerHTML = '✖';
+    rmBtn.addEventListener('click', () => {
+      // fade & remove with small animation
+      const rowEl = tr;
+      rowEl.style.opacity = '0';
+      rowEl.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        participants = participants.filter(x => x.id !== p.id);
+        renderAll(true);
+      }, 220);
+    });
+    tdAction.appendChild(rmBtn);
+
+    tr.appendChild(tdRank);
+    tr.appendChild(tdPlayer);
+    tr.appendChild(tdScore);
+    tr.appendChild(tdAction);
+
+    tbody.appendChild(tr);
+  });
+
+  // render schematic left avatars
+  schematicList.innerHTML = '';
+  participants.forEach((p, idx) => {
+    const item = document.createElement('div');
+    item.className = 'schematic-item';
+    item.dataset.id = p.id;
+
+    const av = document.createElement('img');
+    av.className = 'avatar-med';
+    av.alt = p.name;
+    av.src = p.avatar || placeholderDataUri(p.name);
+
+    const label = document.createElement('div');
+    label.className = 'schem-label';
+    label.innerHTML = `<strong>${idx + 1}</strong>`;
+
+    item.appendChild(av);
+    item.appendChild(label);
+    schematicList.appendChild(item);
+  });
+
+  // run FLIP animation on both table rows and schematic items
+  if (animate) {
+    playFLIP(oldTbodyPositions, '#tbody [data-id]');
+    playFLIP(oldSchematicPositions, '#schematicList [data-id]');
+  }
+}
+
+/* ---------- Placeholder avatar (SVG data URI) ---------- */
+function placeholderDataUri(name) {
+  const initials = (name || 'U').split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+  const bg = '#2f3542';
+  const fg = '#ffd700';
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'>
+    <rect width='100%' height='100%' fill='${bg}' />
+    <text x='50%' y='55%' font-size='48' text-anchor='middle' fill='${fg}' font-family='Segoe UI, Arial' dy='.35em'>${initials}</text>
+  </svg>`;
+  return 'data:image/svg+xml;base64,' + btoa(svg);
+}
+
+/* ---------- Modal & add logic ---------- */
+const openFormBtn = document.getElementById('openFormBtn');
+const modal = document.getElementById('modal');
+const cancelBtn = document.getElementById('cancelBtn');
+const submitBtn = document.getElementById('submitBtn');
+const inputName = document.getElementById('inputName');
+const inputScore = document.getElementById('inputScore');
+const inputImage = document.getElementById('inputImage');
+
+openFormBtn.addEventListener('click', () => {
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden', 'false');
+  inputName.focus();
+});
+
+cancelBtn.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
+
+function closeModal() {
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+  inputName.value = '';
+  inputScore.value = '0';
+  inputImage.value = '';
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => res(fr.result);
+    fr.onerror = rej;
+    fr.readAsDataURL(file);
+  });
+}
+
+submitBtn.addEventListener('click', async () => {
+  const name = inputName.value.trim() || 'Player';
+  const score = clamp(inputScore.value, 0);
+  let avatar = null;
+  if (inputImage.files && inputImage.files[0]) {
+    try {
+      avatar = await readFileAsDataURL(inputImage.files[0]);
+    } catch(e) {
+      console.warn('image read failed', e);
+    }
+  }
+  // temporary animate: insert at bottom then re-sort (FLIP)
+  participants.push({ id: cryptoRandomId(), name, score: Number(score), avatar });
+  closeModal();
+  renderAll(true);
+
+  // small highlight for newly added row
+  requestAnimationFrame(() => {
+    const newRow = document.querySelector(`#tbody [data-id="${participants[participants.length-1].id}"]`);
+    if (newRow) {
+      newRow.classList.add('new-item');
+      setTimeout(()=> newRow.classList.remove('new-item'), 900);
+    }
+  });
+});
+
+/* ---------- initial render ---------- */
+renderAll(false);
+</script>
+<div class="mic">
+<button type="button" class="mic-btn1" title="Voice input" onclick="startMic()"> Start Mic 1 🎤</button>
+<button type="button" class="mic-btn" title="Voice input" onclick="startMic()"> Start Mic 2🎤</button>
+</div>
+
+</body>
+</html>
